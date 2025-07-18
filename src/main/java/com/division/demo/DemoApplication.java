@@ -17,8 +17,7 @@ public class DemoApplication {
 				System.out.println("foofuu");
 			} else if (i % 2 == 0) {
 				System.out.println("foo");
-			}
-			if (i % 2 != 0) {
+			} else {
 				System.out.println(i);
 			}
 		}
