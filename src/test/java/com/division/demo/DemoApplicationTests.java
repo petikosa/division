@@ -1,29 +1,89 @@
 package com.division.demo;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import org.springframework.boot.test.context.TestComponent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 class DemoApplicationTests {
 
-	private final PrintStream standardOut = System.out;
-	private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
+	@Autowired
+	private NumberPrinter numberPrinter;
 
-	@Test
-	void simpleTest() {
-		System.setOut(new PrintStream(outputStreamCaptor));
-		DemoApplication.printNumbers();
-
-		assertThat("1").isEqualTo(outputStreamCaptor.toString().substring(0, 1).trim());
-		assertThat("foo").isEqualTo(outputStreamCaptor.toString().substring(2, 6).trim());
-		assertThat("3").isEqualTo(outputStreamCaptor.toString().substring(7, 9).trim());
-		assertThat("foofuu").isEqualTo(outputStreamCaptor.toString().substring(10, 17).trim());
-		assertThat("5").isEqualTo(outputStreamCaptor.toString().substring(18, 20).trim());
+    @Test
+	void printNumbersToConsole() {
+		System.out.println(numberPrinter.printNumbers(1, 100));
 	}
 
+	@Test
+	void everyOtherNumberIsOdd() {
+		// given
+		int from = 1;
+		int to = 100;
+
+		// when
+		StringBuilder numberStrings = numberPrinter.printNumbers(from, to);
+
+		// then
+		String[] stringArray = splitStrings(numberStrings);
+		for (int i = from; i <= to; i+=2) {
+			assertThat(stringArray[i-1]).isEqualTo(String.valueOf(i));
+		}
+	}
+
+	@Test
+	void everyFourthNumberIsFoo() {
+		// given
+		int from = 1;
+		int to = 100;
+
+		// when
+		StringBuilder numberStrings = numberPrinter.printNumbers(from, to);
+
+		// then
+		String[] stringArray = splitStrings(numberStrings);
+		for (int i = from; i <= to; i+=4) {
+			assertThat(stringArray[i]).isEqualTo(Words.foo.toString());
+		}
+	}
+
+	@Test
+	void everyFourthNumberIsFooFuu() {
+		// given
+		int from = 1;
+		int to = 100;
+
+		// when
+		StringBuilder numberStrings = numberPrinter.printNumbers(from, to);
+
+		// then
+		String[] stringArray = splitStrings(numberStrings);
+		for (int i = from; i <= to; i+=4) {
+			assertThat(stringArray[i+2]).isEqualTo(Words.foofuu.toString());
+		}
+	}
+
+	@Test
+	void worksForNegativeNumbers() {
+		// given
+		int from = -10;
+		int to = 10;
+
+		// when
+		StringBuilder numberStrings = numberPrinter.printNumbers(from, to);
+
+		// then
+		String[] stringArray = splitStrings(numberStrings);
+		System.out.println(numberStrings);
+		for (int i = from; i < to; i+=2) {
+			assertThat(stringArray[i+11]).isEqualTo(String.valueOf(i+1));
+		}
+	}
+
+	private String[] splitStrings(StringBuilder numberStrings) {
+		return numberStrings.toString().split("\n");
+	}
 }
